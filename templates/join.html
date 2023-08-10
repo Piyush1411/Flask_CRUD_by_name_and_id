@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+</head>
+<body>
+    <form method = "POST" action = "{{ url_for('join') }}">
+        <label for = "first_name">First name:</label>
+        <input type = "text" id = "first_name" name="first_name" placeholder = "Enter your first name" required><br/>
+
+        <label for = "first_name">Last name:</label>
+        <input type = "text" id = "last_name" name="last_name" placeholder = "Enter your last name" required><br/>
+
+        <label for = "age">Age:</label>
+        <input type = "numbur" id = "age" name="age" placeholder = "Enter your age" required><br/>
+
+        <label for = "gender">Gender:</label>
+        <select id = "gender" name = "gender" required>
+            <option value = "Male">Male</option>
+            <option value = "Female">Male</option>
+            <option value = "Other">Male</option>
+        </select><br/>
+        
+<label for = "email">Email:</label>
+        <input type = "email" id = "email" name="email" placeholder = "Enter your email" required><br/>
+
+        <label for = "phone">Phone Number:</label>
+        <input type = "tel" id = "phone" name="phone" placeholder = "Enter your phone number" required><br/>
+
+        <label for = "birth_date">Birth Date:</label>
+        <input type = "date" id = "birth_date" name="birth_date" required><br/>
+
+        <input type = "submit" value = "Submit"><br/>
+    </form>
+    
+</body>
+</html>
