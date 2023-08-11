@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from database import init_db, create_user, get_all_users, search_users
+from database import init_db, create_user, get_all_users, search_users,fetch_users_from_dummy_api, save_users_to_database
 
 app = Flask(__name__)
 
@@ -10,7 +10,7 @@ init_db()
 def index():
     return render_template('index.html')
 
-@app.route('/api/users', methods = ['GET'])
+@app.route('/api/users', methods=['GET'])
 def get_users():
     first_name = request.args.get('first_name')
 
@@ -19,10 +19,24 @@ def get_users():
     
     users = search_users(first_name)
 
-    if users:
-        return jsonify(users)
-    else:
-        return jsonify([]), 200
+    if not users:
+        # Fetch users from the external API
+        api_response = fetch_users_from_dummy_api(first_name)
+
+        if api_response:
+            # Save the API response to the database
+            save_users_to_database(api_response)
+            users = api_response
+        else:
+            users = []
+
+    columns = search_users('')[0].keys()  # Fetch column names from the search_users function
+    formatted_users = [{column: user.get(column) for column in columns} for user in users]
+
+    response = {'users': formatted_users}
+    
+    return jsonify(response)
+
 
 @app.route('/join', methods =['GET', 'POST'])
 def join():
