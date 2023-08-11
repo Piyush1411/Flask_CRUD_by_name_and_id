@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from database import init_db, create_user, get_all_users
+from database import init_db, create_user, get_all_users, search_users
 
 app = Flask(__name__)
 
@@ -9,6 +9,20 @@ init_db()
 @app.route('/home')
 def index():
     return render_template('index.html')
+
+@app.route('/api/users', methods = ['GET'])
+def get_users():
+    first_name = request.args.get('first_name')
+
+    if not first_name:
+        return jsonify({'error': 'Missing mandatory query parameter: first_name'}), 400
+    
+    users = search_users(first_name)
+
+    if users:
+        return jsonify(users)
+    else:
+        return jsonify([]), 200
 
 @app.route('/join', methods =['GET', 'POST'])
 def join():

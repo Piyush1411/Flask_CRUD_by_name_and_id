@@ -42,4 +42,45 @@ def get_all_users():
 
     return users
 
+def search_users_by_name(first_name):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
 
+    cursor.execute("SELECT * FROM user WHERE first_name LIKE ?", (f"{first_name}%",))
+    matching_users = cursor.fetchall()
+
+    conn.close()
+
+    return matching_users
+
+def fetch_users_from_dummy_api(first_name):
+    dummy_api_url = f"https://dummyjson.com/users/search?q={first_name}"
+    response = requests.get(dummy_api_url)
+    new_users_data = response.json()
+
+    new_users = new_users_data.get('users', [])
+    return new_users
+
+def save_users_to_database(users):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.executemany(
+        "INSERT INTO user (first_name, last_name, age, gender, email, phone, birth_date) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [(user.get('first_name'), user.get('last_name'), user.get('age'), user.get('gender'), user.get('email'), user.get('phone'), user.get('birth_date')) for user in users]
+    )
+    conn.commit()
+    conn.close()
+
+def search_users(first_name):
+    matching_users = search_users_by_name(first_name)
+
+    if matching_users:
+        return matching_users
+    else:
+        new_users = fetch_users_from_dummy_api(first_name)
+        if new_users:
+            save_users_to_database(new_users)
+            return new_users
+        else:
+            return []
