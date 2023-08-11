@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from collections import OrderedDict
 from database import init_db, create_user, get_all_users, search_users,fetch_users_from_dummy_api, save_users_to_database
 
 app = Flask(__name__)
@@ -9,6 +10,10 @@ init_db()
 @app.route('/home')
 def index():
     return render_template('index.html')
+
+import json
+
+# ... (other code)
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
@@ -30,12 +35,21 @@ def get_users():
         else:
             users = []
 
-    columns = search_users('')[0].keys()  # Fetch column names from the search_users function
-    formatted_users = [{column: user.get(column) for column in columns} for user in users]
+    field_order = ['id', 'first_name', 'last_name', 'age', 'gender', 'email', 'phone', 'birth_date']
+
+    formatted_users = []
+    for user in users:
+        formatted_user = OrderedDict()
+        for field in field_order:
+            formatted_user[field] = user.get(field)
+        formatted_users.append(formatted_user)
 
     response = {'users': formatted_users}
     
-    return jsonify(response)
+    # Manually construct the JSON response with sorted keys
+    json_response = json.dumps(response, indent=2, sort_keys=False)
+
+    return json_response
 
 
 @app.route('/join', methods =['GET', 'POST'])
